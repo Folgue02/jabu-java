@@ -6,7 +6,7 @@ import java.util.*;
  *
  * @author folgue
  */
-class TaskRepository {
+public class TaskRepository {
     private static TaskRepository instance;
 
     public Map<String, Task> tasks = new HashMap<>();

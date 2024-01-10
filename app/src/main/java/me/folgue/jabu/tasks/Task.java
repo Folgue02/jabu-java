@@ -22,7 +22,7 @@ public interface Task {
      * @throws Exception Thrown by the task itself (<i>depends on the task</i>).
      * @throws ParseException If the provided arguments to the task are not valid. 
      */
-    public void run(CliParameters superConfig, String[] args) throws Exception, ParseException;
+    public void run(CliParameters superConfig, List<String> args) throws Exception, ParseException;
 
     /**
      * @return An ordered list of specified tasks to be executed before executing this

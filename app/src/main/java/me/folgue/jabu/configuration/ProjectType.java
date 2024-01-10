@@ -15,11 +15,11 @@ public enum ProjectType {
      * @return Enum variant corresponding to the given string, or {@code null} if
      * the string doesn't correspond to any of the variants.
      */
-    public static ProjectType ofString(String rawString) {
+    public static ProjectType ofString(String rawString) throws IllegalArgumentException {
         return switch (rawString.toLowerCase()) {
             case "binary" -> Binary;
             case "library" -> Library;
-            default -> null;
+            default -> throw new IllegalArgumentException("'" + rawString + "' is not related to any project type.");
         };
     }
 }

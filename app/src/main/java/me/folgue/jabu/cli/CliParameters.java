@@ -3,11 +3,6 @@ package me.folgue.jabu.cli;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 
 /**
@@ -15,92 +10,49 @@ import org.apache.commons.cli.ParseException;
  * @author folgue
  */
 public class CliParameters {
-    public static abstract class CliEvent extends Exception {}
-    public static class NoTask extends CliEvent {}
-    public static class InvalidDirectory extends CliEvent{}
-    public static class HelpMessage extends CliEvent {}
-    public static class VersionRequested extends CliEvent {}
-
     public String directory;
-    public List<String> tasks;
-    public String jabuFile;
+    public Optional<String> taskToRun;
+    public File jabuFile;
+    public List<String> taskArgs = new ArrayList<>();
 
 
-    public CliParameters(String[] args) throws ParseException, CliEvent {
-        Options options = new Options();
-        
-        Option[] parameters = {
-            Option.builder()
-                .longOpt("directory")
-                .option("d")
-                .hasArg(true)
-                .desc("Directory to work on.")
-                .build(),
-            Option.builder()
-                .option("h")
-                .longOpt("help")
-                .hasArg(false)
-                .desc("Displays a help message.")
-                .build(),
-            Option.builder()
-                .option("f")
-                .longOpt("jabu-file")
-                .hasArg(true)
-                .desc("Jabu build configuration file.")
-                .build(),
-            Option.builder()
-                .option("v")
-                .longOpt("version")
-                .hasArg(false)
-                .desc("Displays the version of Jabu.")
-                .build()
-        };
-        
-        for (var opt : parameters)
-            options.addOption(opt);
-        
-        CommandLine parsedArgs = new DefaultParser().parse(options, args);
-        this.initialize(parsedArgs, options);
+    protected CliParameters(String directory, Optional<String> taskToRun, File jabuFile, List<String> taskArgs) {
+        this.directory = directory;
+        this.taskToRun = taskToRun;
+        this.jabuFile = jabuFile;
+        this.taskArgs = taskArgs;
     }
-    
-    private void initialize(CommandLine parsedArgs, Options options) throws CliEvent { 
-        // -h
-        if (parsedArgs.hasOption("help")) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("jabu [tasks...] [options...]", options);
-            throw new HelpMessage();
+
+    public CliParameters(String[] args) throws ParseException {
+        this.directory = System.getProperty("user.dir");
+        this.taskToRun = ((List<String>)Arrays.asList(args)).stream().findFirst();
+        this.jabuFile = Path.of(this.directory, "jabu.json").toFile();
+
+        if (args.length > 1) {
+            String[] newArgs = new String[args.length - 1];
+            System.arraycopy(args, 1, newArgs, 0, newArgs.length);
+            this.taskArgs = (List<String>)Arrays.asList(newArgs);
         }
+    }
 
-        // -v
-        if (parsedArgs.hasOption("version"))
-            throw new VersionRequested();
+    @Override
+    public boolean equals(Object other) {
+        if (this == other)
+            return true;
 
-        if (parsedArgs.getArgList().isEmpty())
-            throw new NoTask();
-        else
-            this.tasks = parsedArgs.getArgList();
-        
-        // -d
-        if (parsedArgs.hasOption("directory")) {
-            this.directory = parsedArgs.getOptionValue("directory");
+        if (other instanceof CliParameters cliOther) {
+            return this.taskArgs.equals(cliOther.taskArgs)
+                && this.jabuFile.equals(cliOther.jabuFile)
+                && this.taskToRun.equals(cliOther.taskToRun)
+                && this.directory.equals(cliOther.directory);
         } else {
-            // The default directory is the cwd
-            this.directory = System.getProperty("user.dir");
+            return false;
         }
-
-        // -f
-        if (parsedArgs.hasOption("jabu-file)")) {
-            this.jabuFile = parsedArgs.getOptionValue("jabu-file");
-        } else {
-            this.jabuFile = Path.of(this.directory, "jabu.json").toString();
-        }
-        
-        if (!new File(this.directory).isDirectory())
-            throw new InvalidDirectory();
     }
 
     @Override
     public String toString() {
-        return "CliParameters{" + "directory=" + directory + ", task=" + tasks + ", jabuFile=" + jabuFile + '}';
+    //String directory, Optional<String> taskToRun, File jabuFile, List<String> taskArgs
+        return String.format("Directory: %s, Task to run: %s, Jabufile: %s, Task's args: %s", this.directory, this.taskToRun, this.jabuFile, this.taskArgs);
     }
 }
