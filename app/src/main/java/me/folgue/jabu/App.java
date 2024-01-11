@@ -2,13 +2,12 @@ package me.folgue.jabu;
 
 import me.folgue.jabu.cli.CliParameters;
 import me.folgue.jabu.tasks.TaskRepository;
+import me.folgue.jabu.tasks.implementations.Build;
 import me.folgue.jabu.tasks.implementations.Create;
 import me.folgue.jabu.tasks.Task;
 import java.util.*;
 
 import org.apache.commons.cli.ParseException;
-
-
 
 public class App {
     public static final String VERSION = "0.0.1";
@@ -40,9 +39,9 @@ public class App {
 
     public static void registerDefaultTasks() {
         TaskRepository.registerTask("create", new Create());
+        TaskRepository.registerTask("build", new Build());
     }
 
     public static void displayAllTasks() {
-
     }
 }

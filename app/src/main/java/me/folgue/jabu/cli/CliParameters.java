@@ -35,6 +35,35 @@ public class CliParameters {
         }
     }
 
+    /**
+     * Checks if the {@code this.directory} attribute points to an actual directory.
+     * @return {@code true} if the directory exists and <b>is a directory</b>, {@code false}
+     * otherwise (<i>doesn't matter if it exists and it's a file, or if the path doesn't point 
+     * to anything</i>).
+     */
+    public boolean directoryExists() {
+        return new File(this.directory).isDirectory();
+    }
+
+    /**
+     * Checks if the {@code this.jabuFile} exists, and points to a file.
+     * @return {@code true} only, and only if the path points to something 
+     * that exists and it's a file.
+     */
+    public boolean jabuFileExists() {
+        return this.jabuFile.isFile();
+    }
+
+    /**
+     * Checks if {@code this.directory} exists, and it contains
+     * a file of the name {@code this.jabuFile}.
+     * @return {@code true} if the environment is valid, {@code false},
+     * otherwise.
+     */
+    public boolean isEnvironmentValid() {
+        return this.jabuFileExists() && this.directoryExists();
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this == other)

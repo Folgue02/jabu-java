@@ -74,7 +74,7 @@ public class Create implements Task, ProjectSchema.CreationHook {
             throw new Exception("No/Invalid project type specified");
 
         System.out.println("=> Creating dirs...");
-        projectSchema.createDirs(projectDir.toString(), this);
+        projectSchema.create(projectDir.toString(), this, null);
 
         var config = Configuration.defaultOfType(taskConfig.type, taskConfig.name);
         config.writeToFile(jabuFilePath.toFile());
